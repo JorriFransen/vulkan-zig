@@ -2,58 +2,8 @@ const std = @import("std");
 const mem = std.mem;
 const Allocator = mem.Allocator;
 
-pub fn isZigPrimitiveType(name: []const u8) bool {
-    if (name.len > 1 and (name[0] == 'u' or name[0] == 'i')) {
-        for (name[1..]) |c| {
-            switch (c) {
-                '0'...'9' => {},
-                else => break,
-            }
-        } else return true;
-    }
-
-    const primitives = [_][]const u8{
-        "void",
-        "comptime_float",
-        "comptime_int",
-        "bool",
-        "isize",
-        "usize",
-        "f16",
-        "f32",
-        "f64",
-        "f128",
-        "noreturn",
-        "type",
-        "anyerror",
-        "c_short",
-        "c_ushort",
-        "c_int",
-        "c_uint",
-        "c_long",
-        "c_ulong",
-        "c_longlong",
-        "c_ulonglong",
-        "c_longdouble",
-        // Removed in stage 2 in https://github.com/ziglang/zig/commit/05cf44933d753f7a5a53ab289ea60fd43761de57,
-        // but these are still invalid identifiers in stage 1.
-        "undefined",
-        "true",
-        "false",
-        "null",
-    };
-
-    for (primitives) |reserved| {
-        if (mem.eql(u8, reserved, name)) {
-            return true;
-        }
-    }
-
-    return false;
-}
-
-pub fn writeIdentifier(w: *std.io.Writer, id: []const u8) !void {
-    try w.print("{f}", .{std.zig.fmtId(id)});
+pub fn writeIdentifier(writer: anytype, id: []const u8) !void {
+    try writer.print("{f}", .{std.zig.fmtId(id)});
 }
 
 pub const CaseStyle = enum {
